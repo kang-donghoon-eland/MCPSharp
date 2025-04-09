@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 namespace MCPSharp.Example.LmStudioChatCLI
 {
     internal static class LmStudioUtilities
-    //internal static class OllamaUtilities
     {
         public static HttpClient SharedClient { get; } = new HttpClient()
         {

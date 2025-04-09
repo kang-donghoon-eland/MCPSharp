@@ -27,18 +27,16 @@ namespace MCPSharp.Example.LmStudioChatCLI
             var llmRequest = new LlmRequest()
             {
                 Model = model,
-                //시스템 프롬프트
-                Prompt = "[REQUEST]: " + manualRequest,
+                
+                Prompt = assistantprompt, // template
                 Stream = false,
                 Messages = new List<LlmMessage>()
             };
 
             if (!string.IsNullOrWhiteSpace(systemprompt))
                 llmRequest.Messages.Add(LlmMessage.CreateSystemMessage(systemprompt));
-            if (!string.IsNullOrWhiteSpace(assistantprompt))
-                llmRequest.Messages.Add(LlmMessage.CreateAssistantMessage(assistantprompt));
             if (!string.IsNullOrWhiteSpace(languagePrompt))
-                llmRequest.Messages.Add(LlmMessage.CreateAssistantMessage(languagePrompt));
+                llmRequest.Messages.Add(LlmMessage.CreateUserMessage(languagePrompt));
             if(!string.IsNullOrWhiteSpace(userCode))
                 llmRequest.Messages.Add(LlmMessage.CreateUserMessage(userCode));
             if (!string.IsNullOrWhiteSpace(manualRequest))
