@@ -1,5 +1,6 @@
 ﻿using MCPSharp.Example.LmStudioChatCLI;
 using Microsoft.Extensions.AI;
+using Microsoft.SemanticKernel.ChatCompletion;
 using System.Text;
 using System.Text.Json;
 
