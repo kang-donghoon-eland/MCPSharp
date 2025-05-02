@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace MCPSharp.Example.LmStudioChatCLI
 {
+
     internal class LlmRequest
     {
         [JsonProperty(PropertyName = "model")]
@@ -17,6 +18,10 @@ namespace MCPSharp.Example.LmStudioChatCLI
 
         [JsonProperty(PropertyName = "messages")]
         public List<LlmMessage> Messages { get; set; }
+
+        public IEnumerable<LlmTool>? Tools { get; set; }
+
+        public LlmRequestOptions? Options { get; set; }
 
         [JsonProperty(PropertyName = "prompt")]
         public string Prompt { get; set; }

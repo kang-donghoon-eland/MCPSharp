@@ -20,6 +20,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure;
 
 namespace MCPSharp.Example.LmStudioChatCLI
 {
@@ -36,22 +37,36 @@ namespace MCPSharp.Example.LmStudioChatCLI
         private readonly string _modelId;
         //private readonly ChatClientMetadata _metadata;
 
-        public LmStudioChatClient(string endpoint, string? modelId = null,  HttpClient? httpClient = null) : this(new Uri(endpoint), modelId, httpClient)
-            //new Uri(Throw.IfNull<string>(endpoint, nameof(endpoint))),
+        public LmStudioChatClient(string endpoint, string? modelId = null, HttpClient? httpClient = null) : this(new Uri(endpoint), modelId, httpClient)
         {
             _serviceEndpoint = new Uri(endpoint);
-            _modelId = modelId;
+            _modelId = modelId ?? throw new ArgumentNullException(nameof(modelId)); // Ensure _modelId is not null
             _metadata = new ChatClientMetadata("LmStudioChatClient", new Uri(endpoint), modelId);
         }
 
         public LmStudioChatClient(Uri endpoint, string? modelId = null, HttpClient? httpClient = null)
         {
             //Throw.IfNull<Uri>(endpoint, nameof(endpoint));
-            //if (modelId != null)
-            //    Throw.IfNullOrWhitespace(modelId, nameof(modelId));
+            if (modelId != null)
+                if (endpoint == null)
+                    throw new ArgumentNullException(nameof(endpoint));
+            if (modelId != null && string.IsNullOrWhiteSpace(modelId))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(modelId));
+                //Throw.IfNullOrWhitespace(modelId, nameof(modelId));
             this._apiChatEndpoint = new Uri(endpoint, "chat/completions");
             this._httpClient = httpClient ?? LmStudioUtilities.SharedClient;
             this._metadata = new ChatClientMetadata("lmstudio", endpoint, modelId);
+        }
+
+        public JsonSerializerOptions ToolCallJsonSerializerOptions
+        {
+            get => this._toolCallJsonSerializerOptions;
+            set
+            {
+                this._toolCallJsonSerializerOptions = value as JsonSerializerOptions;
+                if(this._toolCallJsonSerializerOptions == null)
+                    throw new ArgumentException(string.Format($"value : {value}", nameof(value)));
+            }
         }
 
         public async Task<ChatResponse> GetResponseAsync(
@@ -62,7 +77,10 @@ namespace MCPSharp.Example.LmStudioChatCLI
             LlmRequest req = new LlmRequest();
             req.Model = this._modelId;
             req.Messages = new List<LlmMessage>();
-            foreach(var chat in chatMessages)
+            //req.Tools = options?.Tools?.Select(t => LlmTool());
+
+
+            foreach (var chat in chatMessages)
             {
                 req.Messages.Add(new LlmMessage()
                 {
@@ -125,5 +143,7 @@ namespace MCPSharp.Example.LmStudioChatCLI
         {
             throw new NotImplementedException();
         }
+
+        
     }
 }
